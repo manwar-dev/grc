@@ -1,0 +1,88 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Docker
+docker-compose*.yml
+Dockerfile*
+.dockerignore
+
+# Documentation
+*.md
+README*
+CHANGELOG*
+LICENSE
+docs/
+
+# IDE
+.idea
+.vscode
+.DS_Store
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+logs/
+*.log.*
+
+# Node modules (will be installed in container)
+**/node_modules
+**/dist
+**/build
+
+# PHP/Laravel
+**/vendor
+**/storage/framework/cache
+**/storage/framework/sessions
+**/storage/framework/views
+**/storage/logs
+**/.env.backup
+**/.env.*.php
+**/.phpunit.result.cache
+
+# Testing
+**/tests
+**/test
+**/.phpunit.cache
+**/coverage
+
+# Build artifacts
+**/*.tar
+**/*.zip
+**/*.gz
+
+# Temporary files
+**/tmp
+**/temp
+**/.tmp
+
+# OS files
+Thumbs.db
+Desktop.ini
+
+# Backups
+backups/
+*.backup
+*.bak
+*.old
+
+# Scripts (not needed in container)
+*.sh
+Makefile
+
+# Environment files (will be configured separately)
+.env.example
+.env.docker
+.env.local
+
+# Cache
+**/.cache
+**/cache
+
+# Dependencies lock files (will use fresh versions)
+**/composer.lock
+**/package-lock.json
+**/yarn.lock

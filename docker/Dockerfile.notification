@@ -1,0 +1,74 @@
+# Dockerfile for Notification Service
+FROM php:8.2-fpm
+
+WORKDIR /var/www/html
+
+# Install dependencies
+RUN apt-get update && apt-get install -y \
+    git curl libpng-dev libonig-dev libxml2-dev libzip-dev \
+    zip unzip nginx supervisor \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Install PHP extensions
+RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
+RUN pecl install mongodb redis \
+    && docker-php-ext-enable mongodb redis
+
+# Install Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Copy application
+COPY notification-service/ /var/www/html/
+
+# Create Laravel cache directories
+RUN mkdir -p storage/framework/{cache,sessions,views} storage/logs bootstrap/cache
+
+# Install dependencies
+RUN composer install --no-dev --optimize-autoloader --no-interaction
+
+# Setup environment
+RUN cp .env.example .env || true
+RUN php artisan key:generate || true
+RUN php artisan jwt:secret --force || true
+
+# Set permissions
+RUN chown -R www-data:www-data /var/www/html \
+    && chmod -R 755 /var/www/html \
+    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+
+# Configure nginx
+RUN echo 'server { \n\
+    listen 80; \n\
+    root /var/www/html/public; \n\
+    index index.php; \n\
+    location / { try_files $uri $uri/ /index.php?$query_string; } \n\
+    location ~ \.php$ { \n\
+        fastcgi_pass 127.0.0.1:9000; \n\
+        fastcgi_index index.php; \n\
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name; \n\
+        include fastcgi_params; \n\
+    } \n\
+}' > /etc/nginx/sites-available/default
+
+# Configure supervisor with Reverb
+RUN echo '[supervisord] \n\
+nodaemon=true \n\
+[program:php-fpm] \n\
+command=/usr/local/sbin/php-fpm -F \n\
+autostart=true \n\
+autorestart=true \n\
+[program:nginx] \n\
+command=/usr/sbin/nginx -g "daemon off;" \n\
+autostart=true \n\
+autorestart=true \n\
+[program:reverb] \n\
+command=/usr/local/bin/php /var/www/html/artisan reverb:start --host=0.0.0.0 --port=9000 \n\
+autostart=true \n\
+autorestart=true \n\
+user=www-data' > /etc/supervisor/conf.d/supervisord.conf
+
+RUN mkdir -p /var/log/supervisor
+
+EXPOSE 80 9000
+
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]

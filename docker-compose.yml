@@ -1,0 +1,341 @@
+version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:7.0
+    container_name: grc-mongodb
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-admin123}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - mongodb_config:/data/configdb
+      - ./docker/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    networks:
+      - grc-network
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: grc-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - grc-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # Main Backend Service
+  back:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.back
+    container_name: grc-back
+    restart: always
+    environment:
+      - APP_ENV=${APP_ENV:-production}
+      - APP_DEBUG=${APP_DEBUG:-false}
+      - DB_CONNECTION=mongodb
+      - DB_HOST=mongodb
+      - DB_PORT=27017
+      - DB_DATABASE=grc
+      - DB_USERNAME=${MONGO_ROOT_USER:-admin}
+      - DB_PASSWORD=${MONGO_ROOT_PASSWORD:-admin123}
+      - CACHE_DRIVER=redis
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    volumes:
+      - ./back:/var/www/html
+      - back_storage:/var/www/html/storage
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - grc-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Notification Service
+  notification-service:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.notification
+    container_name: grc-notification
+    restart: always
+    environment:
+      - APP_ENV=${APP_ENV:-production}
+      - APP_DEBUG=${APP_DEBUG:-false}
+      - DB_CONNECTION=mongodb
+      - DB_HOST=mongodb
+      - DB_PORT=27017
+      - DB_DATABASE=notification_grc_db
+      - DB_USERNAME=${MONGO_ROOT_USER:-admin}
+      - DB_PASSWORD=${MONGO_ROOT_PASSWORD:-admin123}
+      - CACHE_DRIVER=redis
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - BROADCAST_DRIVER=reverb
+      - REVERB_HOST=0.0.0.0
+      - REVERB_PORT=9000
+      - USER_SERVICE_URL=http://user-service/api
+    volumes:
+      - ./notification-service:/var/www/html
+      - notification_storage:/var/www/html/storage
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - grc-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # User Service
+  user-service:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.user
+    container_name: grc-user
+    restart: always
+    environment:
+      - APP_ENV=${APP_ENV:-production}
+      - APP_DEBUG=${APP_DEBUG:-false}
+      - DB_CONNECTION=mongodb
+      - DB_HOST=mongodb
+      - DB_PORT=27017
+      - DB_DATABASE=GRC_USER_SERVICE
+      - DB_USERNAME=${MONGO_ROOT_USER:-admin}
+      - DB_PASSWORD=${MONGO_ROOT_PASSWORD:-admin123}
+      - CACHE_DRIVER=redis
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - NOTIFICATION_SERVICE_URL=http://notification-service/api
+    volumes:
+      - ./user-service:/var/www/html
+      - user_storage:/var/www/html/storage
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - grc-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Regulator Service
+  regulator-service:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.regulator
+    container_name: grc-regulator
+    restart: always
+    environment:
+      - APP_ENV=${APP_ENV:-production}
+      - APP_DEBUG=${APP_DEBUG:-false}
+      - DB_CONNECTION=mongodb
+      - DB_HOST=mongodb
+      - DB_PORT=27017
+      - DB_DATABASE=GRC_Regulator_Service
+      - DB_USERNAME=${MONGO_ROOT_USER:-admin}
+      - DB_PASSWORD=${MONGO_ROOT_PASSWORD:-admin123}
+      - CACHE_DRIVER=redis
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - NOTIFICATION_SERVICE_URL=http://notification-service/api
+      - USER_SERVICE_URL=http://back/api
+    volumes:
+      - ./regulator-service:/var/www/html
+      - regulator_storage:/var/www/html/storage
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - grc-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Strategic Plan Service
+  strategic-plan-service:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.strategic
+    container_name: grc-strategic
+    restart: always
+    environment:
+      - APP_ENV=${APP_ENV:-production}
+      - APP_DEBUG=${APP_DEBUG:-false}
+      - DB_CONNECTION=mongodb
+      - DB_HOST=mongodb
+      - DB_PORT=27017
+      - DB_DATABASE=grc
+      - DB_USERNAME=${MONGO_ROOT_USER:-admin}
+      - DB_PASSWORD=${MONGO_ROOT_PASSWORD:-admin123}
+      - CACHE_DRIVER=redis
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    volumes:
+      - ./strategic-plan-service:/var/www/html
+      - strategic_storage:/var/www/html/storage
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - grc-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # KPIs Service
+  kpis:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.kpis
+    container_name: grc-kpis
+    restart: always
+    environment:
+      - APP_ENV=${APP_ENV:-production}
+      - APP_DEBUG=${APP_DEBUG:-false}
+      - DB_CONNECTION=mongodb
+      - DB_HOST=mongodb
+      - DB_PORT=27017
+      - DB_DATABASE=grc-kpi
+      - DB_USERNAME=${MONGO_ROOT_USER:-admin}
+      - DB_PASSWORD=${MONGO_ROOT_PASSWORD:-admin123}
+      - CACHE_DRIVER=redis
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    volumes:
+      - ./kpis:/var/www/html
+      - kpis_storage:/var/www/html/storage
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - grc-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Frontend Service
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: grc-frontend
+    restart: always
+    environment:
+      - VITE_API_BASE_URL=http://localhost
+      - VITE_USER_SERVICE_URL=http://localhost
+      - VITE_NOTIFICATION_SERVICE_URL=http://localhost
+      - VITE_REGULATOR_SERVICE_URL=http://localhost
+      - VITE_STRATEGIC_SERVICE_URL=http://localhost
+      - VITE_KPIS_SERVICE_URL=http://localhost
+      - VITE_WS_URL=ws://localhost
+    depends_on:
+      - back
+      - notification-service
+      - user-service
+      - regulator-service
+      - strategic-plan-service
+      - kpis
+    networks:
+      - grc-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Nginx API Gateway - Main entry point
+  nginx-gateway:
+    image: nginx:alpine
+    container_name: grc-gateway
+    restart: always
+    ports:
+      - "80:80"
+      - "3000:3000"
+    volumes:
+      - ./docker/nginx-gateway.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - back
+      - notification-service
+      - user-service
+      - regulator-service
+      - strategic-plan-service
+      - kpis
+      - frontend
+    networks:
+      - grc-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  grc-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.25.0.0/16
+
+volumes:
+  mongodb_data:
+    driver: local
+  mongodb_config:
+    driver: local
+  redis_data:
+    driver: local
+  back_storage:
+    driver: local
+  notification_storage:
+    driver: local
+  user_storage:
+    driver: local
+  regulator_storage:
+    driver: local
+  strategic_storage:
+    driver: local
+  kpis_storage:
+    driver: local

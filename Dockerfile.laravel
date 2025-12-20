@@ -1,0 +1,97 @@
+# Base Dockerfile for Laravel Services
+FROM php:8.2-fpm
+
+LABEL maintainer="GRC Platform"
+LABEL description="Base image for GRC Laravel microservices"
+
+# Set working directory
+WORKDIR /var/www/html
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    git \
+    curl \
+    libpng-dev \
+    libonig-dev \
+    libxml2-dev \
+    libzip-dev \
+    zip \
+    unzip \
+    nginx \
+    supervisor \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install PHP extensions
+RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
+
+# Install MongoDB extension
+RUN pecl install mongodb \
+    && docker-php-ext-enable mongodb
+
+# Install Redis extension
+RUN pecl install redis \
+    && docker-php-ext-enable redis
+
+# Install Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Set PHP configuration
+RUN cp /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini \
+    && sed -i 's/memory_limit = .*/memory_limit = 512M/' /usr/local/etc/php/php.ini \
+    && sed -i 's/upload_max_filesize = .*/upload_max_filesize = 100M/' /usr/local/etc/php/php.ini \
+    && sed -i 's/post_max_size = .*/post_max_size = 100M/' /usr/local/etc/php/php.ini \
+    && sed -i 's/max_execution_time = .*/max_execution_time = 300/' /usr/local/etc/php/php.ini
+
+# Create nginx config
+RUN echo 'server { \n\
+    listen 80; \n\
+    server_name _; \n\
+    root /var/www/html/public; \n\
+    index index.php index.html; \n\
+    location / { \n\
+        try_files $uri $uri/ /index.php?$query_string; \n\
+    } \n\
+    location ~ \.php$ { \n\
+        fastcgi_pass 127.0.0.1:9000; \n\
+        fastcgi_index index.php; \n\
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name; \n\
+        include fastcgi_params; \n\
+    } \n\
+    location ~ /\.ht { \n\
+        deny all; \n\
+    } \n\
+}' > /etc/nginx/sites-available/default
+
+# Create supervisor config
+RUN echo '[supervisord] \n\
+nodaemon=true \n\
+user=root \n\
+logfile=/var/log/supervisor/supervisord.log \n\
+pidfile=/var/run/supervisord.pid \n\
+\n\
+[program:php-fpm] \n\
+command=/usr/local/sbin/php-fpm -F \n\
+autostart=true \n\
+autorestart=true \n\
+stderr_logfile=/var/log/php-fpm.err.log \n\
+stdout_logfile=/var/log/php-fpm.out.log \n\
+\n\
+[program:nginx] \n\
+command=/usr/sbin/nginx -g "daemon off;" \n\
+autostart=true \n\
+autorestart=true \n\
+stderr_logfile=/var/log/nginx-err.log \n\
+stdout_logfile=/var/log/nginx-out.log' > /etc/supervisor/conf.d/supervisord.conf
+
+# Create log directory
+RUN mkdir -p /var/log/supervisor
+
+# Set permissions
+RUN chown -R www-data:www-data /var/www/html
+
+# Expose port
+EXPOSE 80
+
+# Start supervisor
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
