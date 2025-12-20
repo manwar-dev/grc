@@ -1,0 +1,11 @@
+{
+  "oneClickApps": [
+    {
+      "name": "grc",
+      "displayName": "GRC Platform",
+      "description": "Deploys MongoDB, Redis, Laravel microservices, Vue frontend, and API gateway for the GRC platform.",
+      "isOfficial": false,
+      "logoUrl": "https://dummyimage.com/400x400/1b4ed8/ffffff&text=GRC"
+    }
+  ]
+}
