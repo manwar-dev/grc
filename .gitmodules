@@ -1,21 +1,28 @@
 [submodule "back"]
 	path = back
 	url = https://github.com/PKKSA/BackEndStarterKit.git
+	branch = develop
 [submodule "notification-service"]
 	path = notification-service
 	url = https://github.com/PKKSA/NotificationAndLogsBackEnd.git
+	branch = main
 [submodule "user-service"]
 	path = user-service
 	url = https://github.com/PKKSA/User-Service-BackEnd.git
+	branch = develop
 [submodule "regulator-service"]
 	path = regulator-service
 	url = https://github.com/PKKSA/Regulator-Service.git
+	branch = main
 [submodule "strategic-plan-service"]
 	path = strategic-plan-service
 	url = https://github.com/PKKSA/StrategicPlanService.git
+	branch = main
 [submodule "kpis"]
 	path = kpis
 	url = https://github.com/PKKSA/kpis.git
+	branch = develop
 [submodule "front"]
 	path = front
 	url = https://github.com/PKKSA/Front-Stater-Kit.git
+	branch = develop
