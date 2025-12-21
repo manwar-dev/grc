@@ -617,7 +617,7 @@ caproverOneClickApp:
     - id: $$cap_grc_repo_ref
       label: Git branch or tag
       description: Branch, tag, or commit to build for every service.
-      defaultValue: main
+      defaultValue: master
     - id: $$cap_app_env
       label: Laravel APP_ENV
       defaultValue: production
