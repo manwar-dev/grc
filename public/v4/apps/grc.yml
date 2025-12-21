@@ -59,6 +59,7 @@ services:
           RUN pecl install mongodb redis && docker-php-ext-enable mongodb redis
         - COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
         - |
+          RUN git config --global url."https://$$cap_repo_username:$$cap_repo_pat@github.com/".insteadOf https://github.com/
           RUN git clone --depth 1 --branch ${GRC_REPO_REF} --recurse-submodules --shallow-submodules ${GRC_REPO_URL} /tmp/grc && \
               cp -R /tmp/grc/${SERVICE_PATH}/. /var/www/html && \
               rm -rf /tmp/grc
@@ -148,6 +149,7 @@ services:
           RUN pecl install mongodb redis && docker-php-ext-enable mongodb redis
         - COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
         - |
+          RUN git config --global url."https://$$cap_repo_username:$$cap_repo_pat@github.com/".insteadOf https://github.com/
           RUN git clone --depth 1 --branch ${GRC_REPO_REF} --recurse-submodules --shallow-submodules ${GRC_REPO_URL} /tmp/grc && \
           cp -R /tmp/grc/${SERVICE_PATH}/. /var/www/html && \
           rm -rf /tmp/grc
@@ -239,6 +241,7 @@ services:
           RUN pecl install mongodb redis && docker-php-ext-enable mongodb redis
         - COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
         - |
+          RUN git config --global url."https://$$cap_repo_username:$$cap_repo_pat@github.com/".insteadOf https://github.com/
           RUN git clone --depth 1 --branch ${GRC_REPO_REF} --recurse-submodules --shallow-submodules ${GRC_REPO_URL} /tmp/grc && \
           cp -R /tmp/grc/${SERVICE_PATH}/. /var/www/html && \
           rm -rf /tmp/grc
@@ -326,6 +329,7 @@ services:
           RUN pecl install mongodb redis && docker-php-ext-enable mongodb redis
         - COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
         - |
+          RUN git config --global url."https://$$cap_repo_username:$$cap_repo_pat@github.com/".insteadOf https://github.com/
           RUN git clone --depth 1 --branch ${GRC_REPO_REF} --recurse-submodules --shallow-submodules ${GRC_REPO_URL} /tmp/grc && \
           cp -R /tmp/grc/${SERVICE_PATH}/. /var/www/html && \
           rm -rf /tmp/grc
@@ -411,6 +415,7 @@ services:
           RUN pecl install mongodb redis && docker-php-ext-enable mongodb redis
         - COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
         - |
+          RUN git config --global url."https://$$cap_repo_username:$$cap_repo_pat@github.com/".insteadOf https://github.com/
           RUN git clone --depth 1 --branch ${GRC_REPO_REF} --recurse-submodules --shallow-submodules ${GRC_REPO_URL} /tmp/grc && \
           cp -R /tmp/grc/${SERVICE_PATH}/. /var/www/html && \
           rm -rf /tmp/grc
@@ -496,6 +501,7 @@ services:
           RUN pecl install mongodb redis && docker-php-ext-enable mongodb redis
         - COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
         - |
+          RUN git config --global url."https://$$cap_repo_username:$$cap_repo_pat@github.com/".insteadOf https://github.com/
           RUN git clone --depth 1 --branch ${GRC_REPO_REF} --recurse-submodules --shallow-submodules ${GRC_REPO_URL} /tmp/grc && \
           cp -R /tmp/grc/${SERVICE_PATH}/. /var/www/html && \
           rm -rf /tmp/grc
@@ -569,6 +575,7 @@ services:
         - WORKDIR /app
         - RUN apk add --no-cache git
         - |
+          RUN git config --global url."https://$$cap_repo_username:$$cap_repo_pat@github.com/".insteadOf https://github.com/
           RUN git clone --depth 1 --branch ${GRC_REPO_REF} --recurse-submodules --shallow-submodules ${GRC_REPO_URL} /tmp/grc && \
           cp -R /tmp/grc/front/. /app && \
           rm -rf /tmp/grc
@@ -580,6 +587,7 @@ services:
         - RUN apk add --no-cache git
         - COPY --from=build /app/dist /usr/share/nginx/html
         - |
+          RUN git config --global url."https://$$cap_repo_username:$$cap_repo_pat@github.com/".insteadOf https://github.com/
           RUN git clone --depth 1 --branch ${GRC_REPO_REF} --recurse-submodules --shallow-submodules ${GRC_REPO_URL} /tmp/grc && \
           cp /tmp/grc/docker/nginx-frontend.conf /etc/nginx/conf.d/default.conf && \
           rm -rf /tmp/grc
@@ -602,10 +610,12 @@ services:
         - ARG GRC_REPO_URL=$$cap_grc_repo_url
         - ARG GRC_REPO_REF=$$cap_grc_repo_ref
         - RUN apk add --no-cache git
+        - |
         - |-
+          RUN git config --global url."https://$$cap_repo_username:$$cap_repo_pat@github.com/".insteadOf https://github.com/
           RUN git clone --depth 1 --branch ${GRC_REPO_REF} --recurse-submodules --shallow-submodules ${GRC_REPO_URL} /tmp/grc && \
-          cp /tmp/grc/docker/nginx-gateway.conf /etc/nginx/conf.d/default.conf && \
-          rm -rf /tmp/grc
+              cp /tmp/grc/docker/nginx-gateway.conf /etc/nginx/conf.d/default.conf && \
+              rm -rf /tmp/grc
         - EXPOSE 80 3000
         - CMD ["nginx", "-g", "daemon off;"]
 caproverOneClickApp:
@@ -618,6 +628,12 @@ caproverOneClickApp:
       label: Git branch or tag
       description: Branch, tag, or commit to build for every service.
       defaultValue: master
+    - id: $$cap_repo_username
+      label: GitHub username
+      description: Used for authenticated git clone operations (main repo and private submodules).
+    - id: $$cap_repo_pat
+      label: GitHub personal access token
+      description: Needs repo read access; stored only inside your CapRover instance.
     - id: $$cap_app_env
       label: Laravel APP_ENV
       defaultValue: production
