@@ -51,15 +51,15 @@ services:
         - WORKDIR /var/www/html
         - |
           RUN apt-get update && apt-get install -y \
-              git curl libpng-dev libonig-dev libxml2-dev libzip-dev libldap2-dev \
-              zip unzip nginx supervisor && \
-              apt-get clean && rm -rf /var/lib/apt/lists/*
+            git curl libpng-dev libonig-dev libxml2-dev libzip-dev libldap2-dev \
+            zip unzip nginx supervisor && \
+            apt-get clean && rm -rf /var/lib/apt/lists/*
         - RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip ldap
         - |
           RUN pecl install mongodb redis && docker-php-ext-enable mongodb redis
         - COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
         - |
-          RUN git clone --depth 1 --branch ${GRC_REPO_REF} ${GRC_REPO_URL} /tmp/grc && \
+          RUN git clone --depth 1 --branch ${GRC_REPO_REF} --recurse-submodules --shallow-submodules ${GRC_REPO_URL} /tmp/grc && \
               cp -R /tmp/grc/${SERVICE_PATH}/. /var/www/html && \
               rm -rf /tmp/grc
         - RUN mkdir -p storage/framework/{cache,sessions,views} storage/logs bootstrap/cache
@@ -69,23 +69,23 @@ services:
         - RUN php artisan jwt:secret --force || true
         - |
           RUN chown -R www-data:www-data /var/www/html && \
-              chmod -R 755 /var/www/html && \
-              chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+            chmod -R 755 /var/www/html && \
+            chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
         - |-
           RUN cat <<'EOF' > /etc/nginx/sites-available/default
           server {
-              listen 80;
-              root /var/www/html/public;
-              index index.php;
-              location / {
-                  try_files $uri $uri/ /index.php?$query_string;
-              }
-              location ~ \.php$ {
-                  fastcgi_pass 127.0.0.1:9000;
-                  fastcgi_index index.php;
-                  fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-                  include fastcgi_params;
-              }
+            listen 80;
+            root /var/www/html/public;
+            index index.php;
+            location / {
+                try_files $uri $uri/ /index.php?$query_string;
+            }
+            location ~ \.php$ {
+                fastcgi_pass 127.0.0.1:9000;
+                fastcgi_index index.php;
+                fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+                include fastcgi_params;
+            }
           }
           EOF
         - |-
@@ -140,17 +140,17 @@ services:
         - WORKDIR /var/www/html
         - |
           RUN apt-get update && apt-get install -y \
-              git curl libpng-dev libonig-dev libxml2-dev libzip-dev libldap2-dev \
-              zip unzip nginx supervisor && \
-              apt-get clean && rm -rf /var/lib/apt/lists/*
+            git curl libpng-dev libonig-dev libxml2-dev libzip-dev libldap2-dev \
+            zip unzip nginx supervisor && \
+            apt-get clean && rm -rf /var/lib/apt/lists/*
         - RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip ldap
         - |
           RUN pecl install mongodb redis && docker-php-ext-enable mongodb redis
         - COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
         - |
-          RUN git clone --depth 1 --branch ${GRC_REPO_REF} ${GRC_REPO_URL} /tmp/grc && \
-              cp -R /tmp/grc/${SERVICE_PATH}/. /var/www/html && \
-              rm -rf /tmp/grc
+          RUN git clone --depth 1 --branch ${GRC_REPO_REF} --recurse-submodules --shallow-submodules ${GRC_REPO_URL} /tmp/grc && \
+          cp -R /tmp/grc/${SERVICE_PATH}/. /var/www/html && \
+          rm -rf /tmp/grc
         - RUN mkdir -p storage/framework/{cache,sessions,views} storage/logs bootstrap/cache
         - RUN composer install --no-dev --optimize-autoloader --no-interaction
         - RUN cp .env.example .env || true
@@ -158,23 +158,23 @@ services:
         - RUN php artisan jwt:secret --force || true
         - |
           RUN chown -R www-data:www-data /var/www/html && \
-              chmod -R 755 /var/www/html && \
-              chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+            chmod -R 755 /var/www/html && \
+            chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
         - |-
           RUN cat <<'EOF' > /etc/nginx/sites-available/default
           server {
-              listen 80;
-              root /var/www/html/public;
-              index index.php;
-              location / {
-                  try_files $uri $uri/ /index.php?$query_string;
-              }
-              location ~ \.php$ {
-                  fastcgi_pass 127.0.0.1:9000;
-                  fastcgi_index index.php;
-                  fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-                  include fastcgi_params;
-              }
+            listen 80;
+            root /var/www/html/public;
+            index index.php;
+            location / {
+                try_files $uri $uri/ /index.php?$query_string;
+            }
+            location ~ \.php$ {
+                fastcgi_pass 127.0.0.1:9000;
+                fastcgi_index index.php;
+                fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+                include fastcgi_params;
+            }
           }
           EOF
         - |-
@@ -231,17 +231,17 @@ services:
         - WORKDIR /var/www/html
         - |
           RUN apt-get update && apt-get install -y \
-              git curl libpng-dev libonig-dev libxml2-dev libzip-dev libldap2-dev \
-              zip unzip nginx supervisor && \
-              apt-get clean && rm -rf /var/lib/apt/lists/*
+            git curl libpng-dev libonig-dev libxml2-dev libzip-dev libldap2-dev \
+            zip unzip nginx supervisor && \
+            apt-get clean && rm -rf /var/lib/apt/lists/*
         - RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip ldap
         - |
           RUN pecl install mongodb redis && docker-php-ext-enable mongodb redis
         - COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
         - |
-          RUN git clone --depth 1 --branch ${GRC_REPO_REF} ${GRC_REPO_URL} /tmp/grc && \
-              cp -R /tmp/grc/${SERVICE_PATH}/. /var/www/html && \
-              rm -rf /tmp/grc
+          RUN git clone --depth 1 --branch ${GRC_REPO_REF} --recurse-submodules --shallow-submodules ${GRC_REPO_URL} /tmp/grc && \
+          cp -R /tmp/grc/${SERVICE_PATH}/. /var/www/html && \
+          rm -rf /tmp/grc
         - RUN mkdir -p storage/framework/{cache,sessions,views} storage/logs bootstrap/cache
         - RUN composer install --no-dev --optimize-autoloader --no-interaction
         - RUN cp .env.example .env || true
@@ -249,23 +249,23 @@ services:
         - RUN php artisan jwt:secret --force || true
         - |
           RUN chown -R www-data:www-data /var/www/html && \
-              chmod -R 755 /var/www/html && \
-              chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+            chmod -R 755 /var/www/html && \
+            chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
         - |-
           RUN cat <<'EOF' > /etc/nginx/sites-available/default
           server {
-              listen 80;
-              root /var/www/html/public;
-              index index.php;
-              location / {
-                  try_files $uri $uri/ /index.php?$query_string;
-              }
-              location ~ \.php$ {
-                  fastcgi_pass 127.0.0.1:9000;
-                  fastcgi_index index.php;
-                  fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-                  include fastcgi_params;
-              }
+            listen 80;
+            root /var/www/html/public;
+            index index.php;
+            location / {
+                try_files $uri $uri/ /index.php?$query_string;
+            }
+            location ~ \.php$ {
+                fastcgi_pass 127.0.0.1:9000;
+                fastcgi_index index.php;
+                fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+                include fastcgi_params;
+            }
           }
           EOF
         - |-
@@ -318,17 +318,17 @@ services:
         - WORKDIR /var/www/html
         - |
           RUN apt-get update && apt-get install -y \
-              git curl libpng-dev libonig-dev libxml2-dev libzip-dev libldap2-dev \
-              zip unzip nginx supervisor && \
-              apt-get clean && rm -rf /var/lib/apt/lists/*
+            git curl libpng-dev libonig-dev libxml2-dev libzip-dev libldap2-dev \
+            zip unzip nginx supervisor && \
+            apt-get clean && rm -rf /var/lib/apt/lists/*
         - RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip ldap
         - |
           RUN pecl install mongodb redis && docker-php-ext-enable mongodb redis
         - COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
         - |
-          RUN git clone --depth 1 --branch ${GRC_REPO_REF} ${GRC_REPO_URL} /tmp/grc && \
-              cp -R /tmp/grc/${SERVICE_PATH}/. /var/www/html && \
-              rm -rf /tmp/grc
+          RUN git clone --depth 1 --branch ${GRC_REPO_REF} --recurse-submodules --shallow-submodules ${GRC_REPO_URL} /tmp/grc && \
+          cp -R /tmp/grc/${SERVICE_PATH}/. /var/www/html && \
+          rm -rf /tmp/grc
         - RUN mkdir -p storage/framework/{cache,sessions,views} storage/logs bootstrap/cache
         - RUN composer install --no-dev --optimize-autoloader --no-interaction
         - RUN cp .env.example .env || true
@@ -336,23 +336,23 @@ services:
         - RUN php artisan jwt:secret --force || true
         - |
           RUN chown -R www-data:www-data /var/www/html && \
-              chmod -R 755 /var/www/html && \
-              chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+            chmod -R 755 /var/www/html && \
+            chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
         - |-
           RUN cat <<'EOF' > /etc/nginx/sites-available/default
           server {
-              listen 80;
-              root /var/www/html/public;
-              index index.php;
-              location / {
-                  try_files $uri $uri/ /index.php?$query_string;
-              }
-              location ~ \.php$ {
-                  fastcgi_pass 127.0.0.1:9000;
-                  fastcgi_index index.php;
-                  fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-                  include fastcgi_params;
-              }
+            listen 80;
+            root /var/www/html/public;
+            index index.php;
+            location / {
+                try_files $uri $uri/ /index.php?$query_string;
+            }
+            location ~ \.php$ {
+                fastcgi_pass 127.0.0.1:9000;
+                fastcgi_index index.php;
+                fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+                include fastcgi_params;
+            }
           }
           EOF
         - |-
@@ -403,17 +403,17 @@ services:
         - WORKDIR /var/www/html
         - |
           RUN apt-get update && apt-get install -y \
-              git curl libpng-dev libonig-dev libxml2-dev libzip-dev libldap2-dev \
-              zip unzip nginx supervisor && \
-              apt-get clean && rm -rf /var/lib/apt/lists/*
+            git curl libpng-dev libonig-dev libxml2-dev libzip-dev libldap2-dev \
+            zip unzip nginx supervisor && \
+            apt-get clean && rm -rf /var/lib/apt/lists/*
         - RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip ldap
         - |
           RUN pecl install mongodb redis && docker-php-ext-enable mongodb redis
         - COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
         - |
-          RUN git clone --depth 1 --branch ${GRC_REPO_REF} ${GRC_REPO_URL} /tmp/grc && \
-              cp -R /tmp/grc/${SERVICE_PATH}/. /var/www/html && \
-              rm -rf /tmp/grc
+          RUN git clone --depth 1 --branch ${GRC_REPO_REF} --recurse-submodules --shallow-submodules ${GRC_REPO_URL} /tmp/grc && \
+          cp -R /tmp/grc/${SERVICE_PATH}/. /var/www/html && \
+          rm -rf /tmp/grc
         - RUN mkdir -p storage/framework/{cache,sessions,views} storage/logs bootstrap/cache
         - RUN composer install --no-dev --optimize-autoloader --no-interaction
         - RUN cp .env.example .env || true
@@ -421,23 +421,23 @@ services:
         - RUN php artisan jwt:secret --force || true
         - |
           RUN chown -R www-data:www-data /var/www/html && \
-              chmod -R 755 /var/www/html && \
-              chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+            chmod -R 755 /var/www/html && \
+            chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
         - |-
           RUN cat <<'EOF' > /etc/nginx/sites-available/default
           server {
-              listen 80;
-              root /var/www/html/public;
-              index index.php;
-              location / {
-                  try_files $uri $uri/ /index.php?$query_string;
-              }
-              location ~ \.php$ {
-                  fastcgi_pass 127.0.0.1:9000;
-                  fastcgi_index index.php;
-                  fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-                  include fastcgi_params;
-              }
+            listen 80;
+            root /var/www/html/public;
+            index index.php;
+            location / {
+                try_files $uri $uri/ /index.php?$query_string;
+            }
+            location ~ \.php$ {
+                fastcgi_pass 127.0.0.1:9000;
+                fastcgi_index index.php;
+                fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+                include fastcgi_params;
+            }
           }
           EOF
         - |-
@@ -488,17 +488,17 @@ services:
         - WORKDIR /var/www/html
         - |
           RUN apt-get update && apt-get install -y \
-              git curl libpng-dev libonig-dev libxml2-dev libzip-dev libldap2-dev \
-              zip unzip nginx supervisor && \
-              apt-get clean && rm -rf /var/lib/apt/lists/*
+            git curl libpng-dev libonig-dev libxml2-dev libzip-dev libldap2-dev \
+            zip unzip nginx supervisor && \
+            apt-get clean && rm -rf /var/lib/apt/lists/*
         - RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip ldap
         - |
           RUN pecl install mongodb redis && docker-php-ext-enable mongodb redis
         - COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
         - |
-          RUN git clone --depth 1 --branch ${GRC_REPO_REF} ${GRC_REPO_URL} /tmp/grc && \
-              cp -R /tmp/grc/${SERVICE_PATH}/. /var/www/html && \
-              rm -rf /tmp/grc
+          RUN git clone --depth 1 --branch ${GRC_REPO_REF} --recurse-submodules --shallow-submodules ${GRC_REPO_URL} /tmp/grc && \
+          cp -R /tmp/grc/${SERVICE_PATH}/. /var/www/html && \
+          rm -rf /tmp/grc
         - RUN mkdir -p storage/framework/{cache,sessions,views} storage/logs bootstrap/cache
         - RUN composer install --no-dev --optimize-autoloader --no-interaction
         - RUN cp .env.example .env || true
@@ -506,23 +506,23 @@ services:
         - RUN php artisan jwt:secret --force || true
         - |
           RUN chown -R www-data:www-data /var/www/html && \
-              chmod -R 755 /var/www/html && \
-              chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+            chmod -R 755 /var/www/html && \
+            chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
         - |-
           RUN cat <<'EOF' > /etc/nginx/sites-available/default
           server {
-              listen 80;
-              root /var/www/html/public;
-              index index.php;
-              location / {
-                  try_files $uri $uri/ /index.php?$query_string;
-              }
-              location ~ \.php$ {
-                  fastcgi_pass 127.0.0.1:9000;
-                  fastcgi_index index.php;
-                  fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-                  include fastcgi_params;
-              }
+            listen 80;
+            root /var/www/html/public;
+            index index.php;
+            location / {
+                try_files $uri $uri/ /index.php?$query_string;
+            }
+            location ~ \.php$ {
+                fastcgi_pass 127.0.0.1:9000;
+                fastcgi_index index.php;
+                fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+                include fastcgi_params;
+            }
           }
           EOF
         - |-
@@ -569,9 +569,9 @@ services:
         - WORKDIR /app
         - RUN apk add --no-cache git
         - |
-          RUN git clone --depth 1 --branch ${GRC_REPO_REF} ${GRC_REPO_URL} /tmp/grc && \
-              cp -R /tmp/grc/front/. /app && \
-              rm -rf /tmp/grc
+          RUN git clone --depth 1 --branch ${GRC_REPO_REF} --recurse-submodules --shallow-submodules ${GRC_REPO_URL} /tmp/grc && \
+          cp -R /tmp/grc/front/. /app && \
+          rm -rf /tmp/grc
         - RUN npm install
         - RUN npm run build
         - FROM nginx:alpine
@@ -580,9 +580,9 @@ services:
         - RUN apk add --no-cache git
         - COPY --from=build /app/dist /usr/share/nginx/html
         - |
-          RUN git clone --depth 1 --branch ${GRC_REPO_REF} ${GRC_REPO_URL} /tmp/grc && \
-              cp /tmp/grc/docker/nginx-frontend.conf /etc/nginx/conf.d/default.conf && \
-              rm -rf /tmp/grc
+          RUN git clone --depth 1 --branch ${GRC_REPO_REF} --recurse-submodules --shallow-submodules ${GRC_REPO_URL} /tmp/grc && \
+          cp /tmp/grc/docker/nginx-frontend.conf /etc/nginx/conf.d/default.conf && \
+          rm -rf /tmp/grc
         - EXPOSE 80
         - CMD ["nginx", "-g", "daemon off;"]
   $$cap_appname-gateway:
@@ -603,9 +603,9 @@ services:
         - ARG GRC_REPO_REF=$$cap_grc_repo_ref
         - RUN apk add --no-cache git
         - |-
-          RUN git clone --depth 1 --branch ${GRC_REPO_REF} ${GRC_REPO_URL} /tmp/grc && \
-              cp /tmp/grc/docker/nginx-gateway.conf /etc/nginx/conf.d/default.conf && \
-              rm -rf /tmp/grc
+          RUN git clone --depth 1 --branch ${GRC_REPO_REF} --recurse-submodules --shallow-submodules ${GRC_REPO_URL} /tmp/grc && \
+          cp /tmp/grc/docker/nginx-gateway.conf /etc/nginx/conf.d/default.conf && \
+          rm -rf /tmp/grc
         - EXPOSE 80 3000
         - CMD ["nginx", "-g", "daemon off;"]
 caproverOneClickApp:
