@@ -56,7 +56,7 @@ services:
             apt-get clean && rm -rf /var/lib/apt/lists/*
         - RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip ldap
         - |
-          RUN pecl install mongodb-1.20.0 redis && docker-php-ext-enable mongodb redis
+          RUN pecl install mongodb-1.21.3 redis && docker-php-ext-enable mongodb redis
         - COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
         - |
           RUN git config --global url."https://$$cap_repo_username:$$cap_repo_pat@github.com/".insteadOf https://github.com/
@@ -146,7 +146,7 @@ services:
             apt-get clean && rm -rf /var/lib/apt/lists/*
         - RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip ldap
         - |
-          RUN pecl install mongodb-1.20.0 redis && docker-php-ext-enable mongodb redis
+          RUN pecl install mongodb-1.21.3 redis && docker-php-ext-enable mongodb redis
         - COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
         - |
           RUN git config --global url."https://$$cap_repo_username:$$cap_repo_pat@github.com/".insteadOf https://github.com/
@@ -238,7 +238,7 @@ services:
             apt-get clean && rm -rf /var/lib/apt/lists/*
         - RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip ldap
         - |
-          RUN pecl install mongodb-1.20.0 redis && docker-php-ext-enable mongodb redis
+          RUN pecl install mongodb-1.21.3 redis && docker-php-ext-enable mongodb redis
         - COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
         - |
           RUN git config --global url."https://$$cap_repo_username:$$cap_repo_pat@github.com/".insteadOf https://github.com/
@@ -326,7 +326,7 @@ services:
             apt-get clean && rm -rf /var/lib/apt/lists/*
         - RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip ldap
         - |
-          RUN pecl install mongodb-1.20.0 redis && docker-php-ext-enable mongodb redis
+          RUN pecl install mongodb-1.21.3 redis && docker-php-ext-enable mongodb redis
         - COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
         - |
           RUN git config --global url."https://$$cap_repo_username:$$cap_repo_pat@github.com/".insteadOf https://github.com/
@@ -412,7 +412,7 @@ services:
             apt-get clean && rm -rf /var/lib/apt/lists/*
         - RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip ldap
         - |
-          RUN pecl install mongodb-1.20.0 redis && docker-php-ext-enable mongodb redis
+          RUN pecl install mongodb-1.21.3 redis && docker-php-ext-enable mongodb redis
         - COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
         - |
           RUN git config --global url."https://$$cap_repo_username:$$cap_repo_pat@github.com/".insteadOf https://github.com/
@@ -498,7 +498,7 @@ services:
             apt-get clean && rm -rf /var/lib/apt/lists/*
         - RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip ldap
         - |
-          RUN pecl install mongodb-1.20.0 redis && docker-php-ext-enable mongodb redis
+          RUN pecl install mongodb-1.21.3 redis && docker-php-ext-enable mongodb redis
         - COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
         - |
           RUN git config --global url."https://$$cap_repo_username:$$cap_repo_pat@github.com/".insteadOf https://github.com/
