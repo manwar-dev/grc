@@ -64,8 +64,8 @@ services:
               cp -R /tmp/grc/${SERVICE_PATH}/. /var/www/html && \
               rm -rf /tmp/grc
         - RUN mkdir -p storage/framework/{cache,sessions,views} storage/logs bootstrap/cache
-        - RUN composer install --no-dev --optimize-autoloader --no-interaction
         - RUN cp .env.example .env || true
+        - RUN composer install --no-dev --optimize-autoloader --no-interaction
         - RUN php artisan key:generate || true
         - RUN php artisan jwt:secret --force || true
         - |
@@ -154,8 +154,8 @@ services:
           cp -R /tmp/grc/${SERVICE_PATH}/. /var/www/html && \
           rm -rf /tmp/grc
         - RUN mkdir -p storage/framework/{cache,sessions,views} storage/logs bootstrap/cache
-        - RUN composer install --no-dev --optimize-autoloader --no-interaction
         - RUN cp .env.example .env || true
+        - RUN composer install --no-dev --optimize-autoloader --no-interaction
         - RUN php artisan key:generate || true
         - RUN php artisan jwt:secret --force || true
         - |
@@ -246,8 +246,8 @@ services:
           cp -R /tmp/grc/${SERVICE_PATH}/. /var/www/html && \
           rm -rf /tmp/grc
         - RUN mkdir -p storage/framework/{cache,sessions,views} storage/logs bootstrap/cache
-        - RUN composer install --no-dev --optimize-autoloader --no-interaction
         - RUN cp .env.example .env || true
+        - RUN composer install --no-dev --optimize-autoloader --no-interaction
         - RUN php artisan key:generate || true
         - RUN php artisan jwt:secret --force || true
         - |
@@ -334,8 +334,8 @@ services:
           cp -R /tmp/grc/${SERVICE_PATH}/. /var/www/html && \
           rm -rf /tmp/grc
         - RUN mkdir -p storage/framework/{cache,sessions,views} storage/logs bootstrap/cache
-        - RUN composer install --no-dev --optimize-autoloader --no-interaction
         - RUN cp .env.example .env || true
+        - RUN composer install --no-dev --optimize-autoloader --no-interaction
         - RUN php artisan key:generate || true
         - RUN php artisan jwt:secret --force || true
         - |
@@ -420,8 +420,8 @@ services:
           cp -R /tmp/grc/${SERVICE_PATH}/. /var/www/html && \
           rm -rf /tmp/grc
         - RUN mkdir -p storage/framework/{cache,sessions,views} storage/logs bootstrap/cache
-        - RUN composer install --no-dev --optimize-autoloader --no-interaction
         - RUN cp .env.example .env || true
+        - RUN composer install --no-dev --optimize-autoloader --no-interaction
         - RUN php artisan key:generate || true
         - RUN php artisan jwt:secret --force || true
         - |
@@ -506,8 +506,8 @@ services:
           cp -R /tmp/grc/${SERVICE_PATH}/. /var/www/html && \
           rm -rf /tmp/grc
         - RUN mkdir -p storage/framework/{cache,sessions,views} storage/logs bootstrap/cache
-        - RUN composer install --no-dev --optimize-autoloader --no-interaction
         - RUN cp .env.example .env || true
+        - RUN composer install --no-dev --optimize-autoloader --no-interaction
         - RUN php artisan key:generate || true
         - RUN php artisan jwt:secret --force || true
         - |

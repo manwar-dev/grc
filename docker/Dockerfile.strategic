@@ -24,11 +24,13 @@ COPY strategic-plan-service/ /var/www/html/
 # Create Laravel cache directories
 RUN mkdir -p storage/framework/{cache,sessions,views} storage/logs bootstrap/cache
 
+# Setup environment
+RUN cp .env.example .env || true
+
 # Install dependencies
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
-# Setup environment
-RUN cp .env.example .env || true
+# Setup application keys
 RUN php artisan key:generate || true
 RUN php artisan jwt:secret --force || true
 
