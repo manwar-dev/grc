@@ -21,18 +21,14 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Copy application
 COPY strategic-plan-service/ /var/www/html/
 
+# Copy shared entrypoint
+COPY docker/entrypoint.sh /entrypoint.sh
+
 # Create Laravel cache directories
 RUN mkdir -p storage/framework/{cache,sessions,views} storage/logs bootstrap/cache
 
-# Setup environment
+# Setup environment template
 RUN cp .env.example .env || true
-
-# Install dependencies
-RUN composer install --no-dev --optimize-autoloader --no-interaction
-
-# Setup application keys
-RUN php artisan key:generate || true
-RUN php artisan jwt:secret --force || true
 
 # Set permissions
 RUN chown -R www-data:www-data /var/www/html \
@@ -69,4 +65,5 @@ RUN mkdir -p /var/log/supervisor
 
 EXPOSE 80
 
+ENTRYPOINT ["/entrypoint.sh"]
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]

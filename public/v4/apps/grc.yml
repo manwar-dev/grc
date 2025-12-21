@@ -65,9 +65,6 @@ services:
               rm -rf /tmp/grc
         - RUN mkdir -p storage/framework/{cache,sessions,views} storage/logs bootstrap/cache
         - RUN cp .env.example .env || true
-        - RUN composer install --no-dev --optimize-autoloader --no-interaction
-        - RUN php artisan key:generate || true
-        - RUN php artisan jwt:secret --force || true
         - |
           RUN chown -R www-data:www-data /var/www/html && \
             chmod -R 755 /var/www/html && \
@@ -104,6 +101,7 @@ services:
           EOF
         - RUN mkdir -p /var/log/supervisor
         - EXPOSE 80
+        - ENTRYPOINT ["/entrypoint.sh"]
         - CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
   $$cap_appname-notification:
     restart: always
@@ -155,7 +153,7 @@ services:
           rm -rf /tmp/grc
         - RUN mkdir -p storage/framework/{cache,sessions,views} storage/logs bootstrap/cache
         - RUN cp .env.example .env || true
-        - RUN composer install --no-dev --optimize-autoloader --no-interaction
+        - RUN DB_CONNECTION=mongodb DB_HOST=127.0.0.1 DB_PORT=27017 DB_DATABASE=notification_grc_db DB_USERNAME=dummy DB_PASSWORD=dummy composer install --no-dev --optimize-autoloader --no-interaction
         - RUN php artisan key:generate || true
         - RUN php artisan jwt:secret --force || true
         - |
@@ -199,6 +197,7 @@ services:
           EOF
         - RUN mkdir -p /var/log/supervisor
         - EXPOSE 80 9000
+        - ENTRYPOINT ["/entrypoint.sh"]
         - CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
   $$cap_appname-user:
     restart: always
@@ -247,7 +246,7 @@ services:
           rm -rf /tmp/grc
         - RUN mkdir -p storage/framework/{cache,sessions,views} storage/logs bootstrap/cache
         - RUN cp .env.example .env || true
-        - RUN composer install --no-dev --optimize-autoloader --no-interaction
+        - RUN DB_CONNECTION=mongodb DB_HOST=127.0.0.1 DB_PORT=27017 DB_DATABASE=GRC_USER_SERVICE DB_USERNAME=dummy DB_PASSWORD=dummy composer install --no-dev --optimize-autoloader --no-interaction
         - RUN php artisan key:generate || true
         - RUN php artisan jwt:secret --force || true
         - |
@@ -286,6 +285,7 @@ services:
           EOF
         - RUN mkdir -p /var/log/supervisor
         - EXPOSE 80
+        - ENTRYPOINT ["/entrypoint.sh"]
         - CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
   $$cap_appname-regulator:
     restart: always
@@ -335,7 +335,7 @@ services:
           rm -rf /tmp/grc
         - RUN mkdir -p storage/framework/{cache,sessions,views} storage/logs bootstrap/cache
         - RUN cp .env.example .env || true
-        - RUN composer install --no-dev --optimize-autoloader --no-interaction
+        - RUN DB_CONNECTION=mongodb DB_HOST=127.0.0.1 DB_PORT=27017 DB_DATABASE=GRC_Regulator_Service DB_USERNAME=dummy DB_PASSWORD=dummy composer install --no-dev --optimize-autoloader --no-interaction
         - RUN php artisan key:generate || true
         - RUN php artisan jwt:secret --force || true
         - |
@@ -374,6 +374,7 @@ services:
           EOF
         - RUN mkdir -p /var/log/supervisor
         - EXPOSE 80
+        - ENTRYPOINT ["/entrypoint.sh"]
         - CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
   $$cap_appname-strategic:
     restart: always
@@ -421,7 +422,7 @@ services:
           rm -rf /tmp/grc
         - RUN mkdir -p storage/framework/{cache,sessions,views} storage/logs bootstrap/cache
         - RUN cp .env.example .env || true
-        - RUN composer install --no-dev --optimize-autoloader --no-interaction
+        - RUN DB_CONNECTION=mongodb DB_HOST=127.0.0.1 DB_PORT=27017 DB_DATABASE=grc DB_USERNAME=dummy DB_PASSWORD=dummy composer install --no-dev --optimize-autoloader --no-interaction
         - RUN php artisan key:generate || true
         - RUN php artisan jwt:secret --force || true
         - |
@@ -460,6 +461,7 @@ services:
           EOF
         - RUN mkdir -p /var/log/supervisor
         - EXPOSE 80
+        - ENTRYPOINT ["/entrypoint.sh"]
         - CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
   $$cap_appname-kpis:
     restart: always
@@ -507,7 +509,7 @@ services:
           rm -rf /tmp/grc
         - RUN mkdir -p storage/framework/{cache,sessions,views} storage/logs bootstrap/cache
         - RUN cp .env.example .env || true
-        - RUN composer install --no-dev --optimize-autoloader --no-interaction
+        - RUN DB_CONNECTION=mongodb DB_HOST=127.0.0.1 DB_PORT=27017 DB_DATABASE=grc-kpi DB_USERNAME=dummy DB_PASSWORD=dummy composer install --no-dev --optimize-autoloader --no-interaction
         - RUN php artisan key:generate || true
         - RUN php artisan jwt:secret --force || true
         - |
@@ -546,6 +548,7 @@ services:
           EOF
         - RUN mkdir -p /var/log/supervisor
         - EXPOSE 80
+        - ENTRYPOINT ["/entrypoint.sh"]
         - CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
   $$cap_appname-frontend:
     restart: always
