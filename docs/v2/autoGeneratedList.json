@@ -1,0 +1,1 @@
+{"appList":["grc"],"appDetails":[{"name":"grc","displayName":"GRC Platform (multi-service)","description":"Deploys MongoDB, Redis, Laravel microservices, the Vue frontend, and an edge gateway for the GRC platform via CapRover.","isOfficial":false,"logoUrl":"grc.png"}]}

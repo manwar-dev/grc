@@ -1,0 +1,18 @@
+{
+  "name": "grc-one-click-apps",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Third-party CapRover one-click apps for the GRC platform",
+  "scripts": {
+    "format:check": "prettier --check \"./public/**/*.(json|yml)\"",
+    "format:write": "prettier --write \"./public/**/*.(json|yml)\"",
+    "build": "rm -rf ./dist/ && mkdir -p dist && node ./scripts/build_one_click_apps.js && node ./scripts/build_one_click_apps_from_v4.js",
+    "validate": "node ./scripts/validate_apps.js"
+  },
+  "dependencies": {
+    "fs-extra": "^9.0.1",
+    "gh-pages": "^3.1.0",
+    "prettier": "^2.0.5",
+    "yaml": "^1.10.0"
+  }
+}
