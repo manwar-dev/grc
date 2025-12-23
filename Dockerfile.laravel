@@ -17,6 +17,9 @@ RUN apt-get update && apt-get install -y \
     libonig-dev \
     libxml2-dev \
     libzip-dev \
+    libssl-dev \
+    libcurl4-openssl-dev \
+    pkg-config \
     zip \
     unzip \
     nginx \
@@ -89,8 +92,18 @@ stdout_logfile=/var/log/nginx-out.log' > /etc/supervisor/conf.d/supervisord.conf
 # Create log directory
 RUN mkdir -p /var/log/supervisor
 
+# Copy application code from build context
+COPY --from=app . /var/www/html
+
+# Install dependencies
+RUN composer install --no-dev --optimize-autoloader --no-interaction \
+    --ignore-platform-req=ext-mongodb \
+    --ignore-platform-req=ext-ldap \
+    --ignore-platform-req=php-64bit
+
 # Set permissions
-RUN chown -R www-data:www-data /var/www/html
+RUN chown -R www-data:www-data /var/www/html \
+    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
 # Expose port
 EXPOSE 80
