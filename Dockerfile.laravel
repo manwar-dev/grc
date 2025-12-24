@@ -30,6 +30,14 @@ WORKDIR /var/www/html
 # Copy application code from build context
 COPY --from=app . /var/www/html
 
+# Verify MongoDB extension is loaded before composer operations
+RUN php -m | grep -i mongodb || (echo "ERROR: MongoDB extension not loaded!" && exit 1)
+
+# Update MongoDB dependencies first to prevent lock file mismatches
+RUN composer update mongodb/mongodb mongodb/laravel-mongodb --no-dev --no-interaction \
+    --ignore-platform-req=ext-mongodb --ignore-platform-req=ext-ldap --ignore-platform-req=php-64bit \
+    --with-all-dependencies 2>/dev/null || true
+
 # Install dependencies and set permissions in one layer
 RUN composer install --no-dev --optimize-autoloader --no-interaction \
     --ignore-platform-req=ext-mongodb --ignore-platform-req=ext-ldap --ignore-platform-req=php-64bit \
