@@ -23,7 +23,7 @@ RUN cp /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini \
     && sed -i 's/post_max_size = .*/post_max_size = 100M/' /usr/local/etc/php/php.ini \
     && sed -i 's/max_execution_time = .*/max_execution_time = 300/' /usr/local/etc/php/php.ini \
     && echo 'server{listen 80;server_name _;root /var/www/html/public;index index.php;location /{try_files $uri $uri/ /index.php?$query_string;}location ~ \.php${fastcgi_pass 127.0.0.1:9000;fastcgi_index index.php;fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;include fastcgi_params;}location ~ /\.ht{deny all;}}' > /etc/nginx/sites-available/default \
-    && echo -e '[supervisord]\nnodaemon=true\nuser=root\n\n[program:php-fpm]\ncommand=/usr/local/sbin/php-fpm -F\nautostart=true\nautorestart=true\n\n[program:nginx]\ncommand=/usr/sbin/nginx -g "daemon off;"\nautostart=true\nautorestart=true' > /etc/supervisor/conf.d/supervisord.conf
+    && printf '[supervisord]\nnodaemon=true\nuser=root\n\n[program:php-fpm]\ncommand=/usr/local/sbin/php-fpm -F\nautostart=true\nautorestart=true\n\n[program:nginx]\ncommand=/usr/sbin/nginx -g "daemon off;"\nautostart=true\nautorestart=true\n' > /etc/supervisor/conf.d/supervisord.conf
 
 WORKDIR /var/www/html
 
