@@ -95,7 +95,15 @@ RUN mkdir -p /var/log/supervisor
 # Copy application code from build context
 COPY --from=app . /var/www/html
 
-# Install dependencies
+# Update MongoDB dependencies to sync lock file with composer.json
+# This prevents build failures when composer.json requires newer versions
+RUN composer update mongodb/mongodb mongodb/laravel-mongodb --no-dev --no-interaction \
+    --ignore-platform-req=ext-mongodb \
+    --ignore-platform-req=ext-ldap \
+    --ignore-platform-req=php-64bit \
+    --with-all-dependencies || true
+
+# Install all dependencies
 RUN composer install --no-dev --optimize-autoloader --no-interaction \
     --ignore-platform-req=ext-mongodb \
     --ignore-platform-req=ext-ldap \
